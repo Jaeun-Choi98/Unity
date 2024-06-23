@@ -5,7 +5,7 @@ using UnityEngine;
 public class PlayerMove : MonoBehaviour
 {
   public float moveSpeed = 7f;
-
+  
   CharacterController cc;
 
   // 중력 변수
@@ -58,5 +58,11 @@ public class PlayerMove : MonoBehaviour
     
     // 절대 좌표로 벡터 이동
     //transform.position += dir * moveSpeed * Time.deltaTime;    
+  }
+
+  public float hp = 9f;
+  public void DamageAction(float damage)
+  {
+    hp -= damage;
   }
 }
