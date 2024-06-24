@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class EnemyFSM : MonoBehaviour
 {
@@ -19,6 +20,24 @@ public class EnemyFSM : MonoBehaviour
 
   GameObject player;
   CharacterController cc;
+
+  // 공격 가능 범위
+  public float attackDistance = 2f;
+
+  // 초기 위치
+  Vector3 originPos;
+
+  // 이동 가능 범위
+  public float moveDistance = 20f;
+  public float moveSpeed = 5f;
+
+  // 플레이어 발견 범위
+  public float findDistance = 8f;
+
+  // 에너미 체력 및 UI
+  int maxHp = 15;
+  public int hp;
+  public Slider hpSlider;
 
   private void Start()
   {
@@ -50,10 +69,9 @@ public class EnemyFSM : MonoBehaviour
       case EnemyState.Die:
         break;
     }
+    hpSlider.value = (float)hp / (float)maxHp;
   }
 
-  // 플레이어 발견 범위
-  public float findDistance = 8f;
 
   void Idle()
   {
@@ -65,16 +83,6 @@ public class EnemyFSM : MonoBehaviour
     }
   }
 
-  // 공격 가능 범위
-  public float attackDistance = 2f;
-
-  // 초기 위치
-  Vector3 originPos;
-
-  // 이동 가능 범위
-  public float moveDistance = 20f;
-
-  public float moveSpeed = 5f;
 
   void Move()
   {
@@ -137,12 +145,9 @@ public class EnemyFSM : MonoBehaviour
     }
   }
 
-  int maxHp = 15;
-  public int hp;
-  
   public void HitEnemy(int hitPower)
   {
-    if (m_State == EnemyState.Damaged ||  m_State == EnemyState.Die || m_State == EnemyState.Return)
+    if (m_State == EnemyState.Damaged || m_State == EnemyState.Die || m_State == EnemyState.Return)
     {
       return;
     }
@@ -185,4 +190,6 @@ public class EnemyFSM : MonoBehaviour
     print("소멸");
     Destroy(gameObject);
   }
+
+
 }

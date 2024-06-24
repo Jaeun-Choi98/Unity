@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerMove : MonoBehaviour
 {
@@ -17,6 +18,13 @@ public class PlayerMove : MonoBehaviour
   public float jumpPower = 10f;
   public bool isJumping = false;
 
+  // hp 변수
+  public float hp = 20f;
+  float maxHp = 20f;
+  public Slider hpSlider;
+
+  public GameObject hitEffect;
+
   private void Start()
   {
     cc = GetComponent<CharacterController>();
@@ -24,6 +32,12 @@ public class PlayerMove : MonoBehaviour
 
   private void Update()
   {
+    // 게임 상태가 '게임 중' 상태일 때만 조작
+    if(GameManager.gm.gState != GameManager.GameState.Run)
+    {
+      return;
+    }
+
     float h = Input.GetAxis("Horizontal");
     float v = Input.GetAxis("Vertical");
 
@@ -55,14 +69,29 @@ public class PlayerMove : MonoBehaviour
     yVelocity += gravity * Time.deltaTime;
     dir.y = yVelocity;
     cc.Move(dir * moveSpeed * Time.deltaTime);
-    
+
     // 절대 좌표로 벡터 이동
-    //transform.position += dir * moveSpeed * Time.deltaTime;    
+    //transform.position += dir * moveSpeed * Time.deltaTime;
+
+
+    // 현재 플레이어 hp를 ui에 반영
+    hpSlider.value = hp / maxHp;
   }
 
-  public float hp = 9f;
+  
   public void DamageAction(float damage)
   {
     hp -= damage;
+    if (hp > 0)
+    {
+      StartCoroutine(PlayHitEffect());
+    }
+  }
+
+  IEnumerator PlayHitEffect()
+  {
+    hitEffect.SetActive(true);
+    yield return new WaitForSeconds(0.3f);
+    hitEffect.SetActive(false);
   }
 }
