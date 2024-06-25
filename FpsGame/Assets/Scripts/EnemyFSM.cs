@@ -26,6 +26,7 @@ public class EnemyFSM : MonoBehaviour
 
   // 초기 위치
   Vector3 originPos;
+  Quaternion originRot;
 
   // 이동 가능 범위
   public float moveDistance = 20f;
@@ -39,6 +40,8 @@ public class EnemyFSM : MonoBehaviour
   public int hp;
   public Slider hpSlider;
 
+  Animator anim;
+
   private void Start()
   {
     m_State = EnemyState.Idle;
@@ -46,6 +49,8 @@ public class EnemyFSM : MonoBehaviour
     cc = gameObject.GetComponent<CharacterController>();
     originPos = transform.position;
     hp = maxHp;
+    anim = GetComponentInChildren<Animator>();
+    originRot = transform.rotation;
   }
 
   private void Update()
@@ -79,6 +84,7 @@ public class EnemyFSM : MonoBehaviour
     if (Vector3.Distance(transform.position, player.transform.position) < findDistance)
     {
       m_State = EnemyState.Move;
+      anim.SetTrigger("IdleToMove");
       print("대기 상태");
     }
   }
@@ -95,6 +101,7 @@ public class EnemyFSM : MonoBehaviour
     {
       Vector3 dir = (player.transform.position - transform.position).normalized;
       cc.Move(dir * moveSpeed * Time.deltaTime);
+      transform.forward = dir;
     }
     else
     {
@@ -102,6 +109,7 @@ public class EnemyFSM : MonoBehaviour
       print("공격 상태");
       // 공격 상태로 전이시 곧바로 공격
       currentTime = attackDelay;
+      anim.SetTrigger("MoveToAttackDelay");
     }
   }
 
@@ -117,8 +125,12 @@ public class EnemyFSM : MonoBehaviour
       currentTime += Time.deltaTime;
       if (currentTime > attackDelay)
       {
-        player.GetComponent<PlayerMove>().DamageAction((float)attackPower);
+        /* 애니메이션 이벤트에서 공격 함수가 실행
+         * Enemy 하위 오브젝트(Zombie1)에서 해당 애니메이션이 실행됨으로
+         * 공격 함수를 하위 오브젝트(Animator 컴포넌트를 가지고 있는 오브젝트)에서 호출*/
+        // player.GetComponent<PlayerMove>().DamageAction((float)attackPower);
         currentTime = 0;
+        anim.SetTrigger("StartAttack");
       }
     }
     else
@@ -129,6 +141,11 @@ public class EnemyFSM : MonoBehaviour
     }
   }
 
+  public void AttackAction()
+  {
+    player.GetComponent<PlayerMove>().DamageAction((float)attackPower);
+  }
+
   void Return()
   {
     if (Vector3.Distance(transform.position, originPos) > 0.1f)
@@ -136,12 +153,15 @@ public class EnemyFSM : MonoBehaviour
       Vector3 dir = (originPos - transform.position).normalized;
       hp = maxHp;
       cc.Move(dir * moveSpeed * Time.deltaTime);
+      transform.forward = originPos;
     }
     else
     {
       transform.position = originPos;
+      transform.rotation = originRot;
       m_State = EnemyState.Idle;
       print("대기상태");
+      anim.SetTrigger("MoveToIdle");
     }
   }
 
@@ -155,12 +175,14 @@ public class EnemyFSM : MonoBehaviour
     if (hp > 0)
     {
       m_State = EnemyState.Damaged;
+      anim.SetTrigger("Damaged");
       print("상태 이전: Any state -> Damaged");
       Damaged();
     }
     else
     {
       m_State = EnemyState.Die;
+      anim.SetTrigger("Die");
       print("상태 이전: Any state -> Die");
       Die();
     }
@@ -172,7 +194,7 @@ public class EnemyFSM : MonoBehaviour
 
   IEnumerator DamageProcess()
   {
-    yield return new WaitForSeconds(0.5f);
+    yield return new WaitForSeconds(1f);
     m_State = EnemyState.Move;
     print("이동상태");
   }
