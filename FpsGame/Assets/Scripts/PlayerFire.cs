@@ -17,9 +17,12 @@ public class PlayerFire : MonoBehaviour
 
   public int waeponPower = 5;
 
+  Animator anim;
+
   private void Start()
   {
     ps = bulletEffect.GetComponent<ParticleSystem>();
+    anim = GetComponentInChildren<Animator>();
   }
 
   private void Update()
@@ -41,6 +44,10 @@ public class PlayerFire : MonoBehaviour
 
     if (Input.GetMouseButtonDown(0))
     {
+      if(anim.GetFloat("MoveMotion") == 0)
+      {
+        anim.SetTrigger("Attack");
+      }
       Ray ray = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
       RaycastHit hitInfo = new RaycastHit();
       if (Physics.Raycast(ray, out hitInfo))

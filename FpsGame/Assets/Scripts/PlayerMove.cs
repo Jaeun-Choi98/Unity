@@ -25,9 +25,12 @@ public class PlayerMove : MonoBehaviour
 
   public GameObject hitEffect;
 
+  Animator anim;
+
   private void Start()
   {
     cc = GetComponent<CharacterController>();
+    anim = GetComponentInChildren<Animator>();
   }
 
   private void Update()
@@ -43,6 +46,9 @@ public class PlayerMove : MonoBehaviour
 
     Vector3 dir = new Vector3(h, 0, v);
     dir = dir.normalized;
+
+    // 이동 블랜딩 트리를 호출하고 벡터의 크기 값을 넘겨준다.
+    anim.SetFloat("MoveMotion", dir.magnitude);
 
     // 상대 좌표로 벡터 이동(메인 카메라 기준)
     dir = Camera.main.transform.TransformDirection(dir);
