@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.UI;
 
 public class EnemyFSM : MonoBehaviour
@@ -42,6 +43,8 @@ public class EnemyFSM : MonoBehaviour
 
   Animator anim;
 
+  NavMeshAgent smith;
+
   private void Start()
   {
     m_State = EnemyState.Idle;
@@ -51,6 +54,7 @@ public class EnemyFSM : MonoBehaviour
     hp = maxHp;
     anim = GetComponentInChildren<Animator>();
     originRot = transform.rotation;
+    smith = GetComponent<NavMeshAgent>();
   }
 
   private void Update()
@@ -99,9 +103,16 @@ public class EnemyFSM : MonoBehaviour
     }
     else if (Vector3.Distance(transform.position, player.transform.position) > attackDistance)
     {
-      Vector3 dir = (player.transform.position - transform.position).normalized;
+      /*Vector3 dir = (player.transform.position - transform.position).normalized;
       cc.Move(dir * moveSpeed * Time.deltaTime);
-      transform.forward = dir;
+      transform.forward = dir;*/
+
+      // 내비게이션 에이전트의 이동을 멈추고 경로를 초기화
+      smith.isStopped = true;
+      smith.ResetPath();
+
+      smith.stoppingDistance = attackDistance;
+      smith.destination = player.transform.position;
     }
     else
     {
@@ -150,13 +161,19 @@ public class EnemyFSM : MonoBehaviour
   {
     if (Vector3.Distance(transform.position, originPos) > 0.1f)
     {
-      Vector3 dir = (originPos - transform.position).normalized;
+      /*Vector3 dir = (originPos - transform.position).normalized;
       hp = maxHp;
       cc.Move(dir * moveSpeed * Time.deltaTime);
-      transform.forward = originPos;
+      transform.forward = originPos;*/
+
+      smith.destination = originPos;
+      smith.stoppingDistance = 0f;
     }
     else
     {
+      smith.isStopped = true; 
+      smith.ResetPath();
+
       transform.position = originPos;
       transform.rotation = originRot;
       m_State = EnemyState.Idle;
@@ -172,6 +189,11 @@ public class EnemyFSM : MonoBehaviour
       return;
     }
     hp -= hitPower;
+
+    // 공격을 받았을 시 경직 상태
+    smith.isStopped = true;
+    smith.ResetPath();
+
     if (hp > 0)
     {
       m_State = EnemyState.Damaged;
