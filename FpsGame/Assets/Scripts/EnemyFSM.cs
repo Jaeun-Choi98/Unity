@@ -89,7 +89,7 @@ public class EnemyFSM : MonoBehaviour
     {
       m_State = EnemyState.Move;
       anim.SetTrigger("IdleToMove");
-      print("대기 상태");
+      //print("대기 상태");
     }
   }
 
@@ -99,7 +99,7 @@ public class EnemyFSM : MonoBehaviour
     if (Vector3.Distance(transform.position, originPos) > moveDistance)
     {
       m_State = EnemyState.Return;
-      print("Return 상태");
+      //print("Return 상태");
     }
     else if (Vector3.Distance(transform.position, player.transform.position) > attackDistance)
     {
@@ -117,7 +117,7 @@ public class EnemyFSM : MonoBehaviour
     else
     {
       m_State = EnemyState.Attack;
-      print("공격 상태");
+      //print("공격 상태");
       // 공격 상태로 전이시 곧바로 공격
       currentTime = attackDelay;
       anim.SetTrigger("MoveToAttackDelay");
@@ -147,7 +147,7 @@ public class EnemyFSM : MonoBehaviour
     else
     {
       m_State = EnemyState.Move;
-      print("이동 상태");
+      //print("이동 상태");
       currentTime = 0;
     }
   }
@@ -162,10 +162,10 @@ public class EnemyFSM : MonoBehaviour
     if (Vector3.Distance(transform.position, originPos) > 0.1f)
     {
       /*Vector3 dir = (originPos - transform.position).normalized;
-      hp = maxHp;
+      
       cc.Move(dir * moveSpeed * Time.deltaTime);
       transform.forward = originPos;*/
-
+      hp = maxHp;
       smith.destination = originPos;
       smith.stoppingDistance = 0f;
     }
@@ -177,7 +177,7 @@ public class EnemyFSM : MonoBehaviour
       transform.position = originPos;
       transform.rotation = originRot;
       m_State = EnemyState.Idle;
-      print("대기상태");
+      //print("대기상태");
       anim.SetTrigger("MoveToIdle");
     }
   }
@@ -198,14 +198,14 @@ public class EnemyFSM : MonoBehaviour
     {
       m_State = EnemyState.Damaged;
       anim.SetTrigger("Damaged");
-      print("상태 이전: Any state -> Damaged");
+      //print("상태 이전: Any state -> Damaged");
       Damaged();
     }
     else
     {
       m_State = EnemyState.Die;
       anim.SetTrigger("Die");
-      print("상태 이전: Any state -> Die");
+      //print("상태 이전: Any state -> Die");
       Die();
     }
   }
@@ -218,7 +218,7 @@ public class EnemyFSM : MonoBehaviour
   {
     yield return new WaitForSeconds(1f);
     m_State = EnemyState.Move;
-    print("이동상태");
+    //print("이동상태");
   }
 
   void Die()
@@ -231,7 +231,7 @@ public class EnemyFSM : MonoBehaviour
   {
     cc.enabled = false;
     yield return new WaitForSeconds(2f);
-    print("소멸");
+    //print("소멸");
     Destroy(gameObject);
   }
 
