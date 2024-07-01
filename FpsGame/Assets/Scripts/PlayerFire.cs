@@ -35,6 +35,14 @@ public class PlayerFire : MonoBehaviour
 
   public GameObject[] effFlash;
 
+  public GameObject weapon01;
+  public GameObject weapon02;
+
+  public GameObject crosshiar01;
+  public GameObject crosshiar02;
+
+  public GameObject crosshiarZoom02;
+
   private void Start()
   {
     ps = bulletEffect.GetComponent<ParticleSystem>();
@@ -47,10 +55,25 @@ public class PlayerFire : MonoBehaviour
     if(wMode == WeaponMode.Normal)
     {
       textWeaponMode.text = "Normal Mode";
+      weapon01.SetActive(true);
+      weapon02.SetActive(false);
+      crosshiar01.SetActive(true);
+      crosshiar02.SetActive(false);
     }
     else
     {
       textWeaponMode.text = "Sniper Mode";
+      weapon01.SetActive(false);
+      weapon02.SetActive(true);
+      crosshiar01.SetActive(false);
+      if (!crosshiarZoom02.active)
+      {
+        crosshiar02.SetActive(true);
+      }
+      else
+      {
+        crosshiar02.SetActive(false);
+      }
     }
 
     if (Input.GetKeyDown(KeyCode.Alpha1))
@@ -84,10 +107,14 @@ public class PlayerFire : MonoBehaviour
           if (!ZoomMode)
           {
             Camera.main.fieldOfView = 15f;
+            crosshiar02.SetActive(false);
+            crosshiarZoom02.SetActive(true);
           }
           else
           {
             Camera.main.fieldOfView = 60f;
+            crosshiar02.SetActive(true);
+            crosshiarZoom02.SetActive(false);
           }
           ZoomMode = !ZoomMode;
           break;
